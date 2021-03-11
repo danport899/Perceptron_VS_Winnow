@@ -1,12 +1,13 @@
-# PerceptronVSWinnow
-Comparing the efficiency of Perceptron vs the WINNOW Linear Classification Algorithm
+# Perceptron VS Winnow
+## Comparing the efficiency of Perceptron vs the WINNOW Linear Classification Algorithm
 
 Perceptron vs. WINNOW
 by Daniel Portuondo
 
-# INTRODUCTION
-	Perceptron and WINNOW, linear classifiers guaranteed to converge into a function that divides linearly separable data, are commonly used machine learning algorithms with countless real-world applications. These methods use a system of weights to uncover the dividing line, plane, or hyperplane dividing the classifications of an n-dimensional space. Both methods rely on relatively small parameters, labeled learning rate in perceptron and alpha in WINNOW, to alter the value of these weights. Although both methods are foundational similar, their core aspect is indeed what makes them so distinct. Perceptron, by nature, is additive, and WINNOW is conversely multiplicative.
-	Perceptron’s weights, equal to the number of attributes in an instance space plus an additional bias attribute, must all be initialized to 0 or some randomly generated number. They are then each multiplied by the value of each corresponding attribute and summed together. It should be noted, of course, that attributes must convey numeric values, if not inherently then somehow manipulated to fit on the numeric spectrum. 
+# Introduction
+
+   Perceptron and WINNOW, linear classifiers guaranteed to converge into a function that divides linearly separable data, are commonly used machine learning algorithms with countless real-world applications. These methods use a system of weights to uncover the dividing line, plane, or hyperplane dividing the classifications of an n-dimensional space. Both methods rely on relatively small parameters, labeled learning rate in perceptron and alpha in WINNOW, to alter the value of these weights. Although both methods are foundational similar, their core aspect is indeed what makes them so distinct. Perceptron, by nature, is additive, and WINNOW is conversely multiplicative.
+   Perceptron’s weights, equal to the number of attributes in an instance space plus an additional bias attribute, must all be initialized to 0 or some randomly generated number. They are then each multiplied by the value of each corresponding attribute and summed together. It should be noted, of course, that attributes must convey numeric values, if not inherently then somehow manipulated to fit on the numeric spectrum. 
   Should the sum value of this calculation surpass the fixed threshold of 0, the example to which these attributes belong is labeled as positive (1 if the class is binary or whatever the class may be). Otherwise, it is labeled negative (or 0). This value, or prediction, is then compared against the true value of the example. If it is correct, the algorithm proceeds to the following example. If not, it works to learn from its mistakes through several adjustments.
 If the hypothesis is higher than the classification – h(x) = 1 and c(x) = 0 – weights must be reduced by the learning rate, a number between 0 and 1 that can often sit well in the middle at 0.5.  If the inverse is true, then weights must be increased.
 wi = wi + η • [c(x) - h(x)]• xi
