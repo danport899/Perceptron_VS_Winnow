@@ -42,7 +42,7 @@ The initial stages of the process began using between [1,3] relevant attributes.
 Using the following classification function:
 ### c(x) = 19.33 x0 -14.23 x8 -3.73x9
 
-                           ![Image 1](/dataGraphs/Epochs3RA.png)
+                           ![Image 1](dataGraphs/Epochs3RA.png)
 
 
                          
