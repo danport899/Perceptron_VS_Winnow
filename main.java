@@ -11,29 +11,37 @@ import java.util.Set;
 
 public class main {
 	
+	//Set total number of artifical attributes to use
 	static final byte totalAttributes = 10;
 	static final long instanceSpace = (long) Math.pow(2, totalAttributes);
 	
+	//Define amount of relevant attributes (max of 10)
 	static final int relevantAttCount = 3;
+	//Define in what percentage increments of instance space to take into training data
 	static double trainingTestingPercentage = .1;
+	//Define amount of iterations to run the program
 	static final int runCap = 50;
+	//Define maximum iterations at which the attempted convergeance times out(Perceptron requires roughly 1000 at 10 relevant attributes to provide good data)
 	static final int maxIterations = 100;
 	
 	
 	static final boolean runningPerceptron = false;
 	static final boolean runningBoth = true;
 	
+	//Minimum accuracy of training required for algorithm to declare convergeance
 	static final double minAccuracy = 1;
 	
-	static List<Car> totalSet = new ArrayList<Car>();
-	static List<Car> trainingSet = new ArrayList<Car>();
-	static List<Car> validationSet = new ArrayList<Car>();
+	static List<Example> totalSet = new ArrayList<Example>();
+	static List<Example> trainingSet = new ArrayList<Example>();
+	static List<Example> validationSet = new ArrayList<Example>();
 
 	
 	public static void main(String[] args) {
-		
+		//Create Instance Set
 		initInstanceSet();
+		//Randomly shuffle instance space
 		Collections.shuffle(totalSet);	
+		//Pull out testing data and store in validationSet
 		initTestingSet();
 		initExampleDivision();
 		
@@ -41,18 +49,19 @@ public class main {
 		int epochCount;
 		int prevEpochCount;
 		BigDecimal decrement = new BigDecimal(0.1);
-		//double accuracy = 0;
 		
 		//Learning rate must be between (0,1]
 		BigDecimal learningRate = new BigDecimal(1.0);
 		//coAlpha must be larger than one;
 		BigDecimal coAlpha = new BigDecimal(2.0);
 		
+		//Stores epochCount, accuracy, and all weights when convergeance is reached
 		DataPack data, primaryData = null;
 		
 
 		if(runningBoth) {
 			
+			//These arrays keep track of results at each 10%,20%, 30%, 40%, 50%, 60% and 70% of instance set in training data
 			int[] totalPercepEpochs = {0,0,0,0,0,0,0};
 			int[] totalWINEpochs = {0,0,0,0,0,0,0};
 			double[] bestCoAlphas = {0,0,0,0,0,0,0};
@@ -60,7 +69,8 @@ public class main {
 			double[] percepAccuracy = {0,0,0,0,0,0,0};
 			double[] WINAccuracy = {0,0,0,0,0,0,0};
 			
-			while(totalRuns < runCap) {	
+			while(totalRuns < runCap) {
+				//Reorganize the whole instance space at each run
 				initInstanceSet();
 				Collections.shuffle(totalSet);			
 				initTestingSet();		
@@ -77,14 +87,17 @@ public class main {
 					epochCount += maxIterations;
 					decrement = new BigDecimal(0.1);
 					
+					//Tracks lowest epoch count
 					int smallestEpoch = maxIterations+1;
+					//Tracks the best learning rate
 					double bestLearningRate = 1;
 					
+					//Running the Perceptron method 
 					do {
 						prevEpochCount = epochCount;
-						//System.out.println(learningRate);
 						data = perceptron(learningRate);
 						epochCount = (data == null) ? maxIterations:data.iterationCount;
+						//Finds lowest(best) epoch count and stores all data on it
 						if(epochCount < smallestEpoch) {
 							smallestEpoch = epochCount;
 							bestLearningRate = learningRate.doubleValue();
@@ -96,6 +109,7 @@ public class main {
 						if(learningRate.doubleValue() <= decrement.doubleValue()) decrement = decrement.divide(new BigDecimal(10));
 						
 					}
+					//Decrease learning rate by 0.1 until it reaches 0.1 to determine the best learning rate, this
 					while(learningRate.doubleValue() >= 0.1);
 					
 					totalPercepEpochs[(int) (trainingTestingPercentage * 10 -1)] += smallestEpoch;
@@ -118,10 +132,12 @@ public class main {
 					
 					
 					smallestEpoch = maxIterations +1;
+					//Tracks best coAlpha value
 					double bestCoAlpha = 2;
 					
+					//Running WINNOW Method
 					do {
-					//System.out.println(coAlpha);
+					
 					prevEpochCount = epochCount;
 					data = WINNOW(coAlpha);
 					epochCount = (data == null) ? maxIterations:data.iterationCount;
@@ -134,8 +150,7 @@ public class main {
 					}
 					coAlpha = coAlpha.subtract(decrement,MathContext.DECIMAL32);
 					if(coAlpha.doubleValue() <= 1.0 +decrement.doubleValue()) decrement = decrement.divide(new BigDecimal(10));	
-					//System.out.println(coAlpha + ": " +epochCount);
-					//if(smallestEpoch < maxIterations && epochCount == maxIterations) break;
+
 					}
 		
 					while(coAlpha.doubleValue() > 1.0001);
@@ -153,6 +168,7 @@ public class main {
 				trainingTestingPercentage = 0.1;
 				totalRuns++;
 			}
+			
 			for(int i=0 ; i < totalPercepEpochs.length; i ++ ) {
 				System.out.println();
 				
@@ -165,7 +181,6 @@ public class main {
 				System.out.println("WINNOW:" +totalWINEpochs[i]/(float)runCap);
 				System.out.println("Average Best coAlpha:" +bestCoAlphas[i]/runCap);
 				System.out.println("Average Accuracy:" + WINAccuracy[i]/runCap);
-				
 			}
 			
 		}
@@ -175,15 +190,13 @@ public class main {
 		else {
 			WINNOW(coAlpha);
 		}
-		
-		//System.out.println("Average Iterations = " + (double)iterationCount/100.0 );
-		//System.out.println("Average Epochs = " + (double)(epochCount)/100.0 );
 			
 		
 		
 		System.out.println("Validation Set Size: " + validationSet.size());
 	}
 	
+	//Generates a linearly seperable formula dependent on the number of relevant attributes desired that maintains an even split of positive and negative data
 	public static boolean classifierChecklist(byte[] byteArray) {
 		
 		double w0, w1, w2, w3 , w4 , w5 , w6, w7 , w8 , w9;
@@ -236,44 +249,48 @@ public class main {
 	}
 	
 	public static void initInstanceSet(){
-		int totalPositive = 0;
+		
+	    int totalPositive = 0;
 		
 	    int boolArraySize =  totalAttributes *2;
 		
+		//Generate all possibilties in the instance space using bit addition
 		for(int i = 0; i < instanceSpace; i ++) {
 			
 			String bin = Integer.toBinaryString(i);
-            while (bin.length() < totalAttributes)
-                bin = "0" + bin;
-            char[] chars = bin.toCharArray();
-          
-            byte[] byteArray = new byte[boolArraySize];
-            for (int j = 0; j < chars.length; j++) {
-                byteArray[j] = (byte) (chars[j] == '0' ? 0 : 1);
-            }
-             
-            for(int k = 0; k < chars.length; k++) {
-            		byteArray[k+totalAttributes] = (byte) ((byteArray[k] == (byte) 0) ? 1 : 0);   	
-            }
-         
-            Car nextCombination = new Car(byteArray);
-    		//add artificial attribute at the end
-    		
-            if(classifierChecklist(byteArray)) {
-            	nextCombination.classification = true;
-            	totalPositive++;
-            }
-            totalSet.add(nextCombination);
+			while (bin.length() < totalAttributes){
+				bin = "0" + bin;
+			}
+
+			char[] chars = bin.toCharArray();
+
+			byte[] byteArray = new byte[boolArraySize];
+			for (int j = 0; j < chars.length; j++) {
+				byteArray[j] = (byte) (chars[j] == '0' ? 0 : 1);
+			}
+
+			for(int k = 0; k < chars.length; k++) {
+				byteArray[k+totalAttributes] = (byte) ((byteArray[k] == (byte) 0) ? 1 : 0);   	
+			}
+
+		    	Example nextCombination = new Example(byteArray);
+
+			//Classifies the example with the appropriate linear equation
+		    	if(classifierChecklist(byteArray)) {
+				nextCombination.classification = true;
+				totalPositive++;
+		    	}
+		   	//add it to the instance space Set
+			totalSet.add(nextCombination);
             
 		}
 		System.out.println("Total Positive Examples: " + totalPositive);
 		
 	}
 	
+	//Pull from the instance Set to final 20% of the data
 	public static void initTestingSet() {
-		
-		
-		
+
 		validationSet.removeAll(validationSet);
 		
 		for(int m = (int) instanceSpace-1; m > (int)(instanceSpace * .8); m--) {
@@ -282,9 +299,9 @@ public class main {
 		}
 	}
 
+	//Generate the training Set
 	public static void initExampleDivision() {
 		
-	
 		int splitOff = (int)(instanceSpace * trainingTestingPercentage) - trainingSet.size();
 		int positiveCount = 0, negativeCount = 0;
 		int counter = totalSet.size()-1;
@@ -311,17 +328,18 @@ public class main {
 		
 		
 		positiveCount = 0;
-		for(Car c: trainingSet) {
+		for(Example c: trainingSet) {
 			if(c.classification) positiveCount++;
 		}
 		System.out.println("Training Set Size: " + trainingSet.size());
 		System.out.println("Positives in Training: " + positiveCount);
-		//compareLists(trainingSet, validationSet);
 		
 	}
 
+	//Run the Perceptron algorithm
 	public static DataPack perceptron(BigDecimal learningRate) {
 		
+		//Generate weights all set to 0
 		List<BigDecimal> weights = generateWeights(false);
 		DataPack data;
 	
@@ -329,38 +347,39 @@ public class main {
 		BigDecimal prediction = new BigDecimal(0);
 		int iterationCount = 0;
 		
+		//End(declare convergeance) when minimum accuracy on training set is reached
 		while(accuracy < minAccuracy) {
 			accuracy = 0;
 			
 			iterationCount++;
 			
-			for(Car c: trainingSet) {
+			for(Example c: trainingSet) {
 				prediction = new BigDecimal(0);
 				int classification = c.classification ? 1 : 0;
+				//Calculate number based on given weights
 				for(int i = 0; i < totalAttributes; i++) {
 					if(c.attributes[i] ==1) {
 						prediction = prediction.add(weights.get(i));
 					}
-					//System.out.print("(" + weights.get(i).doubleValue() + " * " + c.attributes[i] + ") +");		
 				}
 				
+				//Add the bias value
 				prediction = prediction.add(weights.get(weights.size()-1));
-				//System.out.print("(" + weights.get(weights.size()-1) + ") +");
-				//System.out.print("= " + prediction);
+				
+				//If predicted number is positive then prediction is 1, else it is 0
 				if(prediction.doubleValue() > 0) prediction = new BigDecimal(1);
 				else prediction = new BigDecimal(0);
-				//System.out.println(" = " + prediction);
-				//System.out.println(" Actual value =" + classification);
 				
+				//Compare prediction to actual classsified value, if they are not equal adjust weights
 				if(prediction.doubleValue() != classification) {
 					
 					for(int i = 0; i < totalAttributes; i++) {
 						if(c.attributes[i] == 1) {
 							 BigDecimal newWeight = weights.get(i);
+							//Increase or decrease weight by the learningRate
 							 BigDecimal change =  new BigDecimal(learningRate.doubleValue()*(classification - prediction.doubleValue()));
-							 //System.out.println(change);
+	
 							 newWeight = newWeight.add(change,MathContext.DECIMAL32);
-							 //System.out.println(newWeight);
 							 weights.set(i, newWeight);
 						}
 					}
@@ -370,29 +389,33 @@ public class main {
 					 weights.set(weights.size()-1, newWeight);
 				}
 				else {
-					//System.out.println("No changes");
+					//If the prediction was correct, increase the accuracy
 					accuracy++;
 				}
 			}
 			
-			//System.out.println(accuracy + "/" + trainingSet.size());
+			
 			accuracy = accuracy/(double) trainingSet.size();
 			
+			//If the total epochs exceeds the maximum alloted epochs determined by the programmer, return null
 			if(iterationCount == maxIterations) return null;
 		}
 		
+		//Determine accuracy of produced weights on validation set
 		accuracy = validateWeights(weights, 0);
 		
 		data = new DataPack(iterationCount, accuracy, weights );
 		
 		return data;
-		//System.out.println("TOTAL ITERATIONS = " + iterationCount);
+		
 		
 		
 	}
 	
+	//the WINNOW algorithm
 	public static DataPack WINNOW(BigDecimal coAlpha) {
 		
+		//Creates weight set with all weights equal to 1
 		List<BigDecimal> weights = generateWeights(true);
 		DataPack data;
 		
@@ -404,25 +427,21 @@ public class main {
 		while(accuracy < minAccuracy) {
 			accuracy = 0;	
 			iterationCount++;
-			for(Car c: trainingSet) {
+			for(Example c: trainingSet) {
 				prediction = new BigDecimal(0);
 				int classification = c.classification ? 1 : 0;
+				//Sum of all weight and their counterpart values
 				for(int i = 0; i < totalAttributes *2 ; i++) {
 					if(c.attributes[i] == 1) {
-						prediction = prediction.add(weights.get(i),MathContext.DECIMAL32);
-						//System.out.print("(" + weights.get(i) +") +");
-					}
-					
+						prediction = prediction.add(weights.get(i),MathContext.DECIMAL32);				
+					}		
 				}
-				//System.out.print("(" + weights.get(weights.size()-1) +") +");
-				//System.out.print("= " + prediction);
 				if(prediction.doubleValue() > threshhold) prediction = new BigDecimal (1);
 				else prediction = new BigDecimal (0);
-				//System.out.println(" = " + prediction);
-				//System.out.println(" Actual value =" + classification);
+
 				
 				if(prediction.doubleValue() != classification) {
-					//System.out.println("Changing weights");
+					
 					for(int k = 0; k < totalAttributes *2; k++) {
 						if(c.attributes[k] ==1) {
 							 BigDecimal newWeight = weights.get(k);
@@ -445,9 +464,6 @@ public class main {
 		accuracy = validateWeights(weights, threshhold);
 		
 		return data = new DataPack(iterationCount, accuracy, weights);
-		//System.out.println("TOTAL ITERATIONS = " + iterationCount);
-		
-		//return accuracy/(double) validationSet.size();
 		
 
 	}
@@ -457,33 +473,29 @@ public class main {
 		
 		List<BigDecimal> weights = new ArrayList<BigDecimal>();
 		
+		//Perceptron weights
 		if(weightValue) {
 			for(int i = 0; i < totalAttributes * 2; i ++) {
 				BigDecimal one = new BigDecimal(1);
 				weights.add(one);
 			}
 		}
+		//WINNOW weights
 		else {
 			for(int i = 0; i < totalAttributes + 1; i ++) {
 				BigDecimal zero = new BigDecimal(0);
 				weights.add(zero);
 			}
 		}
-		/*
-		//Fill list with RNG weight plus one artificial attribute
-		for(int i = 0; i < totalAttributes + 1; i ++) {
-			double randomWeight =  Math.round(Math.random() * 10.0) / 10.0;
-			if (randomWeight == 0) randomWeight += 0.1;
-			weights.add(randomWeight);
-		}
-		*/
+
 		return weights;
 	}
 
+	//Test weights produced by algorithm on validation set
 	public static double validateWeights(List<BigDecimal> weights, double threshold) {
 		double prediction = 0.0;
 		int accuracy = 0;
-		for(Car c: validationSet) {
+		for(Example c: validationSet) {
 			int classification = c.classification ? 1 : 0;
 			for(int i = 0; i < weights.size(); i++) {
 				byte value;
@@ -491,14 +503,12 @@ public class main {
 				else value= c.attributes[i];
 				
 				prediction += weights.get(i).doubleValue() * value;
-				//System.out.print("(" + weights.get(i) + "*" + value + ") +");
+				
 			}
 			
-			//System.out.print("= " + prediction);
+			
 			if(prediction > threshold) prediction = 1;
 			else prediction = 0;
-			//System.out.println(" = " + prediction);
-			//System.out.println(" Actual value =" + classification);
 			
 			if(prediction == classification) {
 				 accuracy++;
@@ -509,10 +519,10 @@ public class main {
 		return accuracy/(double)validationSet.size();
 	}
 
-	public static boolean compareLists(List<Car> trainingSet, List<Car> validationSet) {	
+	public static boolean compareLists(List<Example> trainingSet, List<Example> validationSet) {	
 		
-		for(Car c1: trainingSet) {
-			for (Car c2: validationSet) {
+		for(Example c1: trainingSet) {
+			for (Example c2: validationSet) {
 				if(c1.attributes.equals(c2.attributes)) return true;;
 			}
 		}
