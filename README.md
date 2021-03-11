@@ -49,6 +49,8 @@ Using the following classification function:
 
                          
 The total iterations required to uncover the hyperplane were asynchronously consistent at 2 epochs, regardless of training data percentage or algorithm. Indeed, the only divergence resided in accuracy.
+
+![Image 3](dataGraphs/Accuracy3RA.png)
  
 WINNOW provides near-perfect accuracy, while Perceptron falls behind by an average of about 1.5%. With our particular validation set, this translates to about 3 misclassifications by Perceptron.
 	Indeed, Perceptron provided this formula:
@@ -60,6 +62,9 @@ WINNOW appears to follow in the same path, similarly highlighting the strength o
 ### h(x) = 16x0 +1x1+ 1x2+ 2x3 + 0.5x4 +2x5 +1x6+2x7 +2x8 + 1x9  + 0.625x10 + 1x11 + 1x12 + 0.5x13 +2x14 + 0.5x15 + 1x16 + 1x17 +.5x18 +1x19
 
 Results truly started becoming interesting beyond this relevant attribute count. At 5 relevant attributes, the data reflected a key difference.
+
+![Image 4](dataGraphs/Examples5RA.png)
+![Image 5](dataGraphs/Accuracy5RA.png)
 
 WINNOW does indeed continue to converge faster than Perceptron. However, its accuracy pivot below that of Perceptron, which remains just about as strong as at 3 relevant attributes. In fact, WINNOW suffered a notable average drop of -10% from its prior status. 
 
@@ -78,7 +83,12 @@ Positive values from the classification function appear to be relatively reflect
 
 Now, proceeding to the maximum number of relevant attributes within our domain, 10, results are drastically different than previously seen.
 
+![Image 6](dataGraphs/Examples10RA.png)
+![Image 7](dataGraphs/Epochs10RA.png)
+
 While the gap between Perceptron and WINNOW has grown exponentially, as expected, a strange occurrence can be observed. Previous examples have shown that as the training data percentage increases, the total epochs visited will naturally be reduced as the algorithms have significantly more data to work with per epoch than the prior training data to adjust their values. However, in this case, it seems Perceptron’s epoch count continues to grow, suggesting that, counter-intuitively, the algorithm finds it harder to converge the more data it is given. Perhaps just as surprising is the resulting accuracy. 
+
+![Image 8](dataGraphs/Accuracy10RA.png)
  
 Accuracy diverges. Once again, counter-intuitively, the more data WINNOW is given, the less accurate it grows. This is because, until now, the program did not consider weights converged unless it completed a full epoch with 100% accuracy. This directive was thus too demanding in the case of perceptron and induced overfitting in the case of WINNOW. Both issues can be resolved by reducing the minimum accuracy to declare convergence.
               
