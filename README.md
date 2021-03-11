@@ -42,7 +42,8 @@ The initial stages of the process began using between [1,3] relevant attributes.
 Using the following classification function:
 ### c(x) = 19.33 x0 -14.23 x8 -3.73x9
 
-                            ![image](https://user-images.githubusercontent.com/31936851/110729161-310afa00-81ec-11eb-81df-c36cfb3b729b.png)
+                           ![image](https://user-images.githubusercontent.com/31936851/110729244-5ac42100-81ec-11eb-911c-7366110ee0e3.png)
+
 
                          
 The total iterations required to uncover the hyperplane were asynchronously consistent at 2 epochs, regardless of training data percentage or algorithm. Indeed, the only divergence resided in accuracy.
@@ -53,7 +54,7 @@ WINNOW provides near-perfect accuracy, while Perceptron falls behind by an avera
 
  A cursory analysis of this formula suggests Perceptron determined any example in which x0 = 1 should be labeled as positive, as it would not be possible for the other corresponding weights to bring the value below zero, even if it was a combined effort. This being said, it does reflect the strength of x0 in the original function, as the other two combined could not prevent the value from surpassing 0. 
  
-	WINNOW appears to follow in the same path, similarly highlighting the strength of x0:
+WINNOW appears to follow in the same path, similarly highlighting the strength of x0:
 ### h(x) = 16x0 +1x1+ 1x2+ 2x3 + 0.5x4 +2x5 +1x6+2x7 +2x8 + 1x9  + 0.625x10 + 1x11 + 1x12 + 0.5x13 +2x14 + 0.5x15 + 1x16 + 1x17 +.5x18 +1x19
 
 Results truly started becoming interesting beyond this relevant attribute count. At 5 relevant attributes, the data reflected a key difference.
