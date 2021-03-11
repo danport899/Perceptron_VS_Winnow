@@ -97,7 +97,7 @@ Accuracy diverges. Once again, counter-intuitively, the more data WINNOW is give
 
 By reducing the accuracy threshold by a single percentage point, the total epochs visited are reduced by almost 50%, while accuracy only under a -2% change. To one valuing speed and memory efficiency, this may be considered a good trade-off. Reducing the threshold even further showcases a significant change for WINNOW.
 
- ![Image 11](dataGraphs/AccuracyWIN10RA%.png)
+ ![Image 11](dataGraphs/AccuracyWIN10RA%25.png)
  
  As the accuracy threshold approaches 90% WINNOW’s accuracy increases and the overfitting is reduced.  Epochs and iterations decreased at a rate similar to perceptron until they plateau at 2. This method was applied to the 5 relevant attribute data, and as expected, WINNOW’s accuracy increased, nearly matching that of perceptron.
 
