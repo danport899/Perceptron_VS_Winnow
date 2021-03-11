@@ -41,6 +41,9 @@ While the learning rate of perceptron does slightly decrease as the relevant att
 The initial stages of the process began using between [1,3] relevant attributes. Due to their Boolean nature, their simplicity was far too easy to solve.
 Using the following classification function:
 ### c(x) = 19.33 x0 -14.23 x8 -3.73x9
+
+                            ![image](https://user-images.githubusercontent.com/31936851/110729161-310afa00-81ec-11eb-81df-c36cfb3b729b.png)
+
                          
 The total iterations required to uncover the hyperplane were asynchronously consistent at 2 epochs, regardless of training data percentage or algorithm. Indeed, the only divergence resided in accuracy.
  
@@ -76,7 +79,6 @@ While the gap between Perceptron and WINNOW has grown exponentially, as expected
  
 Accuracy diverges. Once again, counter-intuitively, the more data WINNOW is given, the less accurate it grows. This is because, until now, the program did not consider weights converged unless it completed a full epoch with 100% accuracy. This directive was thus too demanding in the case of perceptron and induced overfitting in the case of WINNOW. Both issues can be resolved by reducing the minimum accuracy to declare convergence.
               
-
 By reducing the accuracy threshold by a single percentage point, the total epochs visited are reduced by almost 50%, while accuracy only under a -2% change. To one valuing speed and memory efficiency, this may be considered a good trade-off. Reducing the threshold even further showcases a significant change for WINNOW.
  
  As the accuracy threshold approaches 90% WINNOW’s accuracy increases and the overfitting is reduced.  Epochs and iterations decreased at a rate similar to perceptron until they plateau at 2. This method was applied to the 5 relevant attribute data, and as expected, WINNOW’s accuracy increased, nearly matching that of perceptron.
@@ -88,4 +90,3 @@ In order to achieve this efficiency, WINNOW takes advantage of its multiplicativ
 To enhance each algorithm’s respective weakness, one can reduce the minimum accuracy threshold for the algorithm to consider its weights converged. This can aid the process by simplifying perceptron’s expectations and preventing WINNOW from overfitting its data. By changing the accuracy threshold 99%, 95%, and 90%, one can observe as perceptron’s examples visited count decreases rapidly, albeit at the cost of accuracy, and WINNOW’s accuracy steadily increases while still improving its epoch count. 
 
 Thus, a conclusive decision on the proper algorithm to use cannot be made. It is ultimately at the discretion of the needs and values of the developer or engineer to determine which option would be most effective to solve a given problem. This experiment provides a clearer picture of the respective strengths and weaknesses so that this decision can be made with increased information and confidence.
-![image](https://user-images.githubusercontent.com/31936851/110726964-61509980-81e8-11eb-9fc5-47635c3f7884.png)
